@@ -19,7 +19,7 @@ function draw(){sel=null;if(stock.length){let n=+$('draw').value;while(n--&&stoc
 $('new').onclick=init;$('decks').onchange=init;$('columns').onchange=init;
 
 /* Lompack victory: 3D card physics + seven-voice sine synthesizer */
-let audioCtx=null,celebration=null,voices=[],frameId=0,wetBus=null,reverbInput=null,reverbNodes=[],hiddenFoundationCards=[],pickupScreen=null;
+let audioCtx=null,celebration=null,voices=[],frameId=0,wetBus=null,reverbInput=null,reverbNodes=[],reverbOutput=null,hiddenFoundationCards=[],pickupScreen=null,complimentIndex=0;
 function makeReverb(){
  if(!audioCtx)return;
  // Feedback delay network: lush long tail, no additional oscillators.
@@ -27,18 +27,28 @@ function makeReverb(){
  input.gain.value=.65;output.gain.value=.46;
  const delays=[.277,.359,.443,.557],filters=[2700,3100,3500,3900];
  const network=delays.map((d,i)=>{const delay=audioCtx.createDelay(2),feedback=audioCtx.createGain(),low=audioCtx.createBiquadFilter(),tap=audioCtx.createGain();delay.delayTime.value=d;feedback.gain.value=Math.pow(0.001,d/10);low.type='lowpass';low.frequency.value=filters[i];tap.gain.value=.24;input.connect(delay);delay.connect(low);low.connect(feedback);feedback.connect(delay);low.connect(tap);tap.connect(output);return {delay,feedback,low,tap}});
- output.connect(audioCtx.destination);wetBus=input;reverbInput=input;reverbNodes=network;
+ output.connect(audioCtx.destination);wetBus=input;reverbInput=input;reverbOutput=output;reverbNodes=network;
 }
-function removeReverb(){if(reverbInput){try{reverbInput.disconnect();reverbNodes.forEach(n=>{n.delay.disconnect();n.feedback.disconnect();n.low.disconnect();n.tap.disconnect()})}catch(e){}}wetBus=null;reverbInput=null;reverbNodes=[];}
+function removeReverb(){
+ if(reverbOutput){try{reverbOutput.disconnect()}catch(e){}}
+ if(reverbInput){try{reverbInput.disconnect();reverbNodes.forEach(n=>{n.delay.disconnect();n.feedback.disconnect();n.low.disconnect();n.tap.disconnect()})}catch(e){}}
+ wetBus=null;reverbInput=null;reverbOutput=null;reverbNodes=[];
+}
+function silenceVictory(){
+ if(!audioCtx)return;
+ const t=audioCtx.currentTime;
+ voices.forEach(v=>{try{v.gain.gain.cancelScheduledValues(t);v.gain.gain.setTargetAtTime(0,t,.025);v.osc.stop(t+.2)}catch(e){}});
+ voices=[];
+ // Disconnect the output immediately: no accumulated feedback tail reaches speakers.
+ removeReverb();
+}
 function stopCelebration(){
  hiddenFoundationCards.forEach(e=>e.style.visibility='');hiddenFoundationCards=[];
  cancelAnimationFrame(frameId);
  if(celebration){celebration.remove();celebration=null}
- voices.forEach(v=>{try{v.gain.gain.cancelScheduledValues(audioCtx.currentTime);v.gain.gain.setTargetAtTime(0,audioCtx.currentTime,.025);v.osc.stop(audioCtx.currentTime+.15)}catch(e){}});
- voices=[];
- // Let the reverberation decay naturally; old network is disconnected later.
- if(reverbInput){const old=reverbInput,oldNodes=reverbNodes;wetBus=null;reverbInput=null;reverbNodes=[];if(audioCtx){const t=audioCtx.currentTime;old.gain.setTargetAtTime(0,t,3.5);setTimeout(()=>{try{old.disconnect();oldNodes.forEach(n=>{n.delay.disconnect();n.feedback.disconnect();n.low.disconnect();n.tap.disconnect()})}catch(e){}},16000)}}
+ silenceVictory();
 }
+
 function startCelebration(){
  closePickup();stopCelebration();
  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch(e){audioCtx=null}
@@ -119,6 +129,7 @@ function startCelebration(){
 
 function closePickup(){if(pickupScreen){pickupScreen.remove();pickupScreen=null}}
 function showPickupPrompt(){
+ silenceVictory();
  closePickup();
  const screen=document.createElement('div');screen.className='pickup-screen';document.body.appendChild(screen);pickupScreen=screen;
  const prompt=document.createElement('div');prompt.className='pickup-prompt';
@@ -160,7 +171,7 @@ function beginPickup(screen){
    card.style.transform='translate('+dx+'px,'+dy+'px) rotate(0deg) scale(.85)';
    card.style.opacity='0';
    setTimeout(()=>card.remove(),500);
-   if(picked===total){counter.textContent='All cards collected! 🎉'}
+   if(picked===total){const greetings=['You are amazing! ✨','Well done! 🌟','Fabulous work! 💫','Wow, fantastic! 🎉','Brilliant job! 👏','Absolutely wonderful! 💛','You did it! 🏆','That was impressive! ⭐','Beautifully done! 🌈','You are a superstar! 🌟'];const greeting=greetings[complimentIndex++%greetings.length];counter.textContent='All cards collected!';const msg=document.createElement('div');msg.className='pickup-prompt';msg.innerHTML='<h2>'+greeting+'</h2><p>All cards picked up. Thank you!</p>';const done=document.createElement('button');done.textContent='New game';done.onclick=init;msg.appendChild(done);setTimeout(()=>{if(pickupScreen===screen)screen.appendChild(msg)},550)}
   };
   screen.appendChild(card);cards.push(card);
  }
