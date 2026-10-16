@@ -19,16 +19,29 @@ function draw(){sel=null;if(stock.length){let n=+$('draw').value;while(n--&&stoc
 $('new').onclick=init;$('decks').onchange=init;$('columns').onchange=init;
 
 /* Lompack victory: 3D card physics + seven-voice sine synthesizer */
-let audioCtx=null,celebration=null,voices=[],frameId=0;
+let audioCtx=null,celebration=null,voices=[],frameId=0,wetBus=null,reverbInput=null,reverbNodes=[];
+function makeReverb(){
+ if(!audioCtx)return;
+ // Feedback delay network: lush long tail, no additional oscillators.
+ const input=audioCtx.createGain(),output=audioCtx.createGain();
+ input.gain.value=.38;output.gain.value=.32;
+ const delays=[.173,.229,.307,.401],filters=[1700,2100,2500,2900];
+ const network=delays.map((d,i)=>{const delay=audioCtx.createDelay(2),feedback=audioCtx.createGain(),low=audioCtx.createBiquadFilter(),tap=audioCtx.createGain();delay.delayTime.value=d;feedback.gain.value=.79;low.type='lowpass';low.frequency.value=filters[i];tap.gain.value=.23;input.connect(delay);delay.connect(low);low.connect(feedback);feedback.connect(delay);low.connect(tap);tap.connect(output);return {delay,feedback,low,tap}});
+ output.connect(audioCtx.destination);wetBus=input;reverbInput=input;reverbNodes=network;
+}
+function removeReverb(){if(reverbInput){try{reverbInput.disconnect();reverbNodes.forEach(n=>{n.delay.disconnect();n.feedback.disconnect();n.low.disconnect();n.tap.disconnect()})}catch(e){}}wetBus=null;reverbInput=null;reverbNodes=[];}
 function stopCelebration(){
  cancelAnimationFrame(frameId);
  if(celebration){celebration.remove();celebration=null}
  voices.forEach(v=>{try{v.gain.gain.cancelScheduledValues(audioCtx.currentTime);v.gain.gain.setTargetAtTime(0,audioCtx.currentTime,.025);v.osc.stop(audioCtx.currentTime+.15)}catch(e){}});
  voices=[];
+ // Let the reverberation decay naturally; old network is disconnected later.
+ if(reverbInput){const old=reverbInput,oldNodes=reverbNodes;wetBus=null;reverbInput=null;reverbNodes=[];if(audioCtx){const t=audioCtx.currentTime;old.gain.setTargetAtTime(0,t,1.8);setTimeout(()=>{try{old.disconnect();oldNodes.forEach(n=>{n.delay.disconnect();n.feedback.disconnect();n.low.disconnect();n.tap.disconnect()})}catch(e){}},9000)}}
 }
 function startCelebration(){
  stopCelebration();
  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch(e){audioCtx=null}
+ if(audioCtx)makeReverb();
  const overlay=document.createElement('div');overlay.className='celebrate-overlay';document.body.appendChild(overlay);celebration=overlay;
  const count=+$('decks').value*52,particles=[],launchInterval=115,started=performance.now();
  const anchor=document.querySelector('#tableau .col')?.getBoundingClientRect();
@@ -45,10 +58,10 @@ function startCelebration(){
    try{
     const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),pan=audioCtx.createStereoPanner?.();
     osc.type='sine';gain.gain.value=0;osc.connect(gain);
-    if(pan){gain.connect(pan);pan.connect(audioCtx.destination)}else gain.connect(audioCtx.destination);
+    if(pan){gain.connect(pan);pan.connect(audioCtx.destination);if(wetBus)pan.connect(wetBus)}else{gain.connect(audioCtx.destination);if(wetBus)gain.connect(wetBus)}
     osc.frequency.value=250;osc.start();
     const v={osc,gain,pan,p};voices.push(v);p.voice=v;
-    gain.gain.setTargetAtTime(.075,audioCtx.currentTime,.025);
+    gain.gain.setTargetAtTime(.045,audioCtx.currentTime,.025);
    }catch(e){}
   }
   particles.push(p);
