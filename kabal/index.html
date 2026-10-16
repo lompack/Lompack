@@ -1,8 +1,8 @@
-<!doctype html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#12513c"><title>Lompack Kabal</title><style>*{box-sizing:border-box}body{margin:0;background:#12513c;color:white;font:14px system-ui}header{padding:10px;background:#0c3528;display:flex;gap:8px;flex-wrap:wrap;align-items:center}select,button{padding:8px;border:0;border-radius:7px;font-size:14px}main{overflow-x:auto;padding:12px;min-height:85vh}.top,.cols{display:flex;gap:7px;margin-bottom:25px;width:max-content}.pile{width:48px;height:70px;border:1px dashed #a7c9b6;border-radius:6px;position:relative;display:grid;place-items:center}.card{position:absolute;left:0;top:0;width:48px;height:70px;border-radius:6px;background:#fff;color:#111;border:1px solid #aaa;padding:4px;font-weight:bold;font-size:15px;box-shadow:0 1px 2px #0005;touch-action:manipulation}.red{color:#c32735}.back{background:repeating-linear-gradient(45deg,#234eac,#234eac 5px,#426ed1 5px,#426ed1 10px);border:3px solid white}.selected{outline:3px solid #ffdf66;z-index:100!important}.col{width:48px;min-height:70vh;position:relative;border-top:1px dashed #b4d0bd}a{color:white}#celebrate{background:#ffe29a;color:#302310;font-weight:700}.flying-card{position:fixed;left:0;top:0;width:48px;height:70px;display:grid;place-items:center;background:#fff;border:1px solid #aaa;border-radius:6px;box-shadow:0 5px 16px #0007;font-size:17px;font-weight:bold;pointer-events:none;z-index:9999;transform-style:preserve-3d;will-change:transform,opacity}.celebrate-overlay{position:fixed;inset:0;pointer-events:none;z-index:9998;perspective:800px;overflow:hidden}</style></head><body><header><a href="../">← Lompack</a><label>Stokker <select id="decks"><option>1</option><option>2</option><option>3</option></select></label><label>Rader <select id="columns"></select></label><label>Trekk <select id="draw"></select></label><button id="new">Ny kabal</button><button id="celebrate" title="Se seiersanimasjonen uten å spille">🎉 Test seier</button><span id="status"></span></header><main><div class="top"><div class="pile" id="stock"></div><div class="pile" id="waste"></div><div style="width:12px"></div><div id="foundations" style="display:flex;gap:7px"></div></div><div class="cols" id="tableau"></div></main><script>
+<!doctype html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#12513c"><title>Lompack Kabal</title><style>*{box-sizing:border-box}body{margin:0;background:#12513c;color:white;font:14px system-ui}header{padding:10px;background:#0c3528;display:flex;gap:8px;flex-wrap:wrap;align-items:center}select,button{padding:8px;border:0;border-radius:7px;font-size:14px}main{overflow-x:auto;padding:12px;min-height:85vh}.top,.cols{display:flex;gap:7px;margin-bottom:25px;width:max-content}.pile{width:48px;height:70px;border:1px dashed #a7c9b6;border-radius:6px;position:relative;display:grid;place-items:center}.card{position:absolute;left:0;top:0;width:48px;height:70px;border-radius:6px;background:#fff;color:#111;border:1px solid #aaa;padding:4px;font-weight:bold;font-size:15px;box-shadow:0 1px 2px #0005;touch-action:manipulation}.red{color:#c32735}.back{background:repeating-linear-gradient(45deg,#234eac,#234eac 5px,#426ed1 5px,#426ed1 10px);border:3px solid white}.selected{outline:3px solid #ffdf66;z-index:100!important}.col{width:48px;min-height:70vh;position:relative;border-top:1px dashed #b4d0bd}a{color:white}#celebrate{background:#ffe29a;color:#302310;font-weight:700}.flying-card{position:fixed;left:0;top:0;width:48px;height:70px;display:grid;place-items:center;background:#fff;border:1px solid #aaa;border-radius:6px;box-shadow:0 5px 16px #0007;font-size:17px;font-weight:bold;pointer-events:none;z-index:9999;transform-style:preserve-3d;will-change:transform,opacity}.celebrate-overlay{position:fixed;inset:0;pointer-events:none;z-index:9998;perspective:800px;overflow:hidden} .pickup-screen{position:fixed;inset:0;z-index:10020;background:#12513c;overflow:hidden}.pickup-prompt{position:absolute;z-index:10050;top:20%;left:50%;transform:translateX(-50%);background:#0b3529;padding:24px;border-radius:16px;text-align:center;box-shadow:0 10px 45px #0009;width:min(90vw,330px)}.pickup-prompt h2{margin:0 0 20px}.pickup-prompt button{margin:5px;padding:12px 22px}.pickup-card{position:absolute;width:48px;height:70px;background:white;border:1px solid #aaa;border-radius:6px;display:grid;place-items:center;font-weight:bold;font-size:16px;box-shadow:0 2px 6px #0008;touch-action:manipulation;transition:transform .48s ease-in,opacity .48s ease-in}.pickup-card:focus{outline:3px solid #ffd66b}.pickup-stack{position:absolute;bottom:22px;right:22px;width:64px;height:90px;border:2px dashed #a9d6bd;border-radius:7px;display:grid;place-items:center;font-size:11px;text-align:center;z-index:10040;pointer-events:none}.pickup-stack .stack-layer{position:absolute;width:48px;height:70px;border:2px solid #fff;border-radius:5px;background:repeating-linear-gradient(45deg,#234eac,#234eac 5px,#426ed1 5px,#426ed1 10px)}.pickup-counter{position:absolute;top:15px;left:15px;font-weight:bold;z-index:10040}.pickup-close{position:absolute;top:12px;right:12px;z-index:10045} </style></head><body><header><a href="../">← Lompack</a><label>Stokker <select id="decks"><option>1</option><option>2</option><option>3</option></select></label><label>Rader <select id="columns"></select></label><label>Trekk <select id="draw"></select></label><button id="new">Ny kabal</button><button id="celebrate" title="Se seiersanimasjonen uten å spille">🎉 Test seier</button><span id="status"></span></header><main><div class="top"><div class="pile" id="stock"></div><div class="pile" id="waste"></div><div style="width:12px"></div><div id="foundations" style="display:flex;gap:7px"></div></div><div class="cols" id="tableau"></div></main><script>
 const suits=['♠','♥','♣','♦'];const red=s=>s===1||s===2;let cols=[],stock=[],waste=[],found=[],sel=null,won=false;const $=id=>document.getElementById(id);
 for(let n=1;n<=12;n++)$('columns').add(new Option(n,n));$('columns').value='7';for(let n=1;n<=5;n++)$('draw').add(new Option(n,n));$('draw').value='3';
 function make(){let a=[];for(let d=0;d<+$('decks').value;d++)for(let s=0;s<4;s++)for(let v=1;v<=13;v++)a.push({s,v,up:false,id:d+'-'+s+'-'+v});for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function init(){stopCelebration();let a=make(),n=+$('columns').value;cols=Array.from({length:n},()=>[]);for(let i=0;i<n;i++)for(let j=0;j<=i;j++){if(!a.length)break;let c=a.pop();c.up=j===i;cols[i].push(c)}stock=a;waste=[];found=Array.from({length:4*(+$('decks').value)},()=>[]);sel=null;won=false;stopCelebration();render()}
+function init(){closePickup();stopCelebration();let a=make(),n=+$('columns').value;cols=Array.from({length:n},()=>[]);for(let i=0;i<n;i++)for(let j=0;j<=i;j++){if(!a.length)break;let c=a.pop();c.up=j===i;cols[i].push(c)}stock=a;waste=[];found=Array.from({length:4*(+$('decks').value)},()=>[]);sel=null;won=false;stopCelebration();render()}
 function el(tag,cls,parent){let x=document.createElement(tag);x.className=cls||'';parent.appendChild(x);return x}
 function card(c,parent,y,fn){let e=el('div','card'+(red(c.s)?' red':'')+(!c.up?' back':''),parent);e.style.top=y+'px';if(c.up)e.textContent=({1:'A',11:'J',12:'Q',13:'K'}[c.v]||c.v)+suits[c.s];e.onclick=ev=>{ev.stopPropagation();fn()};return e}
 function pick(type,i,j){if(sel&&move(type,i)){sel=null;render();return}if(type==='col'&&cols[i][j]?.up)sel={type,i,j};else if(type==='waste'&&waste.length)sel={type};else if(type==='found'&&found[i].length)sel={type,i};else sel=null;render()}
@@ -19,7 +19,7 @@ function draw(){sel=null;if(stock.length){let n=+$('draw').value;while(n--&&stoc
 $('new').onclick=init;$('decks').onchange=init;$('columns').onchange=init;
 
 /* Lompack victory: 3D card physics + seven-voice sine synthesizer */
-let audioCtx=null,celebration=null,voices=[],frameId=0,wetBus=null,reverbInput=null,reverbNodes=[],hiddenFoundationCards=[];
+let audioCtx=null,celebration=null,voices=[],frameId=0,wetBus=null,reverbInput=null,reverbNodes=[],hiddenFoundationCards=[],pickupScreen=null;
 function makeReverb(){
  if(!audioCtx)return;
  // Feedback delay network: lush long tail, no additional oscillators.
@@ -40,7 +40,7 @@ function stopCelebration(){
  if(reverbInput){const old=reverbInput,oldNodes=reverbNodes;wetBus=null;reverbInput=null;reverbNodes=[];if(audioCtx){const t=audioCtx.currentTime;old.gain.setTargetAtTime(0,t,3.5);setTimeout(()=>{try{old.disconnect();oldNodes.forEach(n=>{n.delay.disconnect();n.feedback.disconnect();n.low.disconnect();n.tap.disconnect()})}catch(e){}},16000)}}
 }
 function startCelebration(){
- stopCelebration();
+ closePickup();stopCelebration();
  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch(e){audioCtx=null}
  if(audioCtx)makeReverb();
  const overlay=document.createElement('div');overlay.className='celebrate-overlay';document.body.appendChild(overlay);celebration=overlay;
@@ -112,10 +112,60 @@ function startCelebration(){
    }
   }
   if(launched<count||particles.length)frameId=requestAnimationFrame(animate);
-  else{overlay.remove();if(celebration===overlay)celebration=null;hiddenFoundationCards.forEach(e=>e.style.visibility='');hiddenFoundationCards=[]}
+  else{overlay.remove();if(celebration===overlay){celebration=null;showPickupPrompt()}hiddenFoundationCards.forEach(e=>e.style.visibility='');hiddenFoundationCards=[]}
  }
  frameId=requestAnimationFrame(animate);
 }
+
+function closePickup(){if(pickupScreen){pickupScreen.remove();pickupScreen=null}}
+function showPickupPrompt(){
+ closePickup();
+ const screen=document.createElement('div');screen.className='pickup-screen';document.body.appendChild(screen);pickupScreen=screen;
+ const prompt=document.createElement('div');prompt.className='pickup-prompt';
+ prompt.innerHTML='<h2>Pick up the cards?</h2>';
+ const yes=document.createElement('button');yes.textContent='Yes';
+ const no=document.createElement('button');no.textContent='No';
+ prompt.append(yes,no);screen.appendChild(prompt);
+ no.onclick=()=>closePickup();
+ yes.onclick=()=>{prompt.remove();beginPickup(screen)};
+}
+function beginPickup(screen){
+ const total=52*(+$('decks').value),cards=[];
+ const counter=document.createElement('div');counter.className='pickup-counter';screen.appendChild(counter);
+ const close=document.createElement('button');close.className='pickup-close';close.textContent='✕';close.onclick=closePickup;screen.appendChild(close);
+ const stack=document.createElement('div');stack.className='pickup-stack';stack.textContent='Collected cards';screen.appendChild(stack);
+ const bounds=()=>({w:window.innerWidth,h:window.innerHeight});
+ let picked=0;counter.textContent='0 / '+total;
+ // Make overlapping cards across the visible table; tapping a visible card collects it.
+ for(let d=0;d<+$('decks').value;d++)for(let suit=0;suit<4;suit++)for(let v=1;v<=13;v++){
+  const card=document.createElement('button');card.className='pickup-card';
+  card.textContent=({1:'A',11:'J',12:'Q',13:'K'}[v]||v)+suits[suit];
+  card.style.color=red(suit)?'#c32735':'#111';
+  const {w,h}=bounds(),x=12+Math.random()*Math.max(1,w-85),y=70+Math.random()*Math.max(1,h-220);
+  const angle=(Math.random()-.5)*150;
+  card.style.left=x+'px';card.style.top=y+'px';card.style.transform='rotate('+angle+'deg)';
+  card.style.zIndex=String(10+cards.length);
+  card.setAttribute('aria-label','Pick up '+card.textContent);
+  card.onclick=()=>{
+   if(card.disabled)return;card.disabled=true;
+   // Collected cards visibly grow into a deck, one layer for each pickup.
+   const layer=document.createElement('div');layer.className='stack-layer';
+   const offset=Math.min(15,Math.floor(picked/8));
+   layer.style.transform='translate('+(offset*.3)+'px,'+(-offset*.7)+'px)';
+   layer.style.zIndex=String(picked+1);stack.appendChild(layer);
+   picked++;counter.textContent=picked+' / '+total;
+   const target=stack.getBoundingClientRect();
+   const dx=target.left+target.width/2-(x+24),dy=target.top+target.height/2-(y+35);
+   card.style.zIndex='10039';card.style.pointerEvents='none';
+   card.style.transform='translate('+dx+'px,'+dy+'px) rotate(0deg) scale(.85)';
+   card.style.opacity='0';
+   setTimeout(()=>card.remove(),500);
+   if(picked===total){counter.textContent='All cards collected! 🎉'}
+  };
+  screen.appendChild(card);cards.push(card);
+ }
+}
+
 $('celebrate').onclick=()=>startCelebration();
 init();
 
