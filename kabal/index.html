@@ -2,7 +2,7 @@
 const suits=['♠','♥','♣','♦'];const red=s=>s===1||s===2;let cols=[],stock=[],waste=[],found=[],sel=null,won=false;const $=id=>document.getElementById(id);
 for(let n=7;n<=12;n++)$('columns').add(new Option(n,n));for(let n=1;n<=5;n++)$('draw').add(new Option(n,n));$('draw').value='3';
 function make(){let a=[];for(let d=0;d<+$('decks').value;d++)for(let s=0;s<4;s++)for(let v=1;v<=13;v++)a.push({s,v,up:false,id:d+'-'+s+'-'+v});for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function init(){let a=make(),n=+$('columns').value;cols=Array.from({length:n},()=>[]);for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let c=a.pop();c.up=j===i;cols[i].push(c)}stock=a;waste=[];found=Array.from({length:4*(+$('decks').value)},()=>[]);sel=null;won=false;stopCelebration();render()}
+function init(){stopCelebration();let a=make(),n=+$('columns').value;cols=Array.from({length:n},()=>[]);for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let c=a.pop();c.up=j===i;cols[i].push(c)}stock=a;waste=[];found=Array.from({length:4*(+$('decks').value)},()=>[]);sel=null;won=false;stopCelebration();render()}
 function el(tag,cls,parent){let x=document.createElement(tag);x.className=cls||'';parent.appendChild(x);return x}
 function card(c,parent,y,fn){let e=el('div','card'+(red(c.s)?' red':'')+(!c.up?' back':''),parent);e.style.top=y+'px';if(c.up)e.textContent=({1:'A',11:'J',12:'Q',13:'K'}[c.v]||c.v)+suits[c.s];e.onclick=ev=>{ev.stopPropagation();fn()};return e}
 function pick(type,i,j){if(sel&&move(type,i)){sel=null;render();return}if(type==='col'&&cols[i][j]?.up)sel={type,i,j};else if(type==='waste'&&waste.length)sel={type};else if(type==='found'&&found[i].length)sel={type,i};else sel=null;render()}
@@ -43,7 +43,7 @@ function startCelebration(){
  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch(e){audioCtx=null}
  if(audioCtx)makeReverb();
  const overlay=document.createElement('div');overlay.className='celebrate-overlay';document.body.appendChild(overlay);celebration=overlay;
- const count=+$('decks').value*52,particles=[],launchInterval=115,started=performance.now();
+ const count=+$('decks').value*52,particles=[],launchInterval=57000/Math.max(1,(+$('decks').value*52)-1),started=performance.now();
  const anchor=document.querySelector('#tableau .col')?.getBoundingClientRect();
  const kingX=anchor?anchor.left+anchor.width/2:innerWidth/2;
  const kingY=anchor?Math.min(innerHeight*.65,anchor.top+210):innerHeight*.58;
@@ -52,8 +52,8 @@ function startCelebration(){
  let launched=0;
  function spawn(now){
   const c=pool[launched++],node=document.createElement('div');node.className='flying-card';node.style.color=red(c.s)?'#c32735':'#151515';node.textContent=({1:'A',11:'J',12:'Q',13:'K'}[c.v]||c.v)+suits[c.s];overlay.appendChild(node);
-  const angle=Math.random()*Math.PI*2, speed=140+Math.random()*520;
-  const p={node,x:kingX+(Math.random()-.5)*130,y:kingY+(Math.random()-.5)*65,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-130,ax:(Math.random()-.5)*85,gravity:100+Math.random()*200,rot:[0,0,0],spin:Array.from({length:3},()=>(Math.random()-.5)*900),born:now,life:2.3+Math.random()*2,voice:null};
+  const angle=Math.random()*Math.PI*2, speed=35+Math.random()*130;
+  const p={node,x:kingX+(Math.random()-.5)*130,y:kingY+(Math.random()-.5)*65,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-130,ax:(Math.random()-.5)*22,gravity:18+Math.random()*48,rot:[0,0,0],spin:Array.from({length:3},()=>(Math.random()-.5)*900),born:now,life:5+Math.random()*4,voice:null};
   if(audioCtx&&voices.length<7){
    try{
     const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),pan=audioCtx.createStereoPanner?.();
