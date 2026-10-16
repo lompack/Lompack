@@ -16,7 +16,7 @@ found.forEach((pile,i)=>{let p=el('div','pile',fs);p.onclick=()=>pick('found',i)
 cols.forEach((pile,i)=>{let p=el('div','col',tb);p.onclick=()=>pick('col',i);let y=0;pile.forEach((c,j)=>{let e=card(c,p,y,()=>pick('col',i,j));if(sel?.type==='col'&&sel.i===i&&j>=sel.j)e.classList.add('selected');y+=c.up?26:15});p.style.minHeight=Math.max(350,y+70)+'px'});
 $('status').textContent=found.reduce((n,p)=>n+p.length,0)+' / '+52*(+$('decks').value);if(found.every(p=>p.length===13)){ $('status').textContent='🎉 Du vant!';if(!won){won=true;setTimeout(()=>startCelebration(),350)}}}
 function draw(){sel=null;if(stock.length){let n=+$('draw').value;while(n--&&stock.length){let c=stock.pop();c.up=true;waste.push(c)}}else if(waste.length){stock=waste.reverse();stock.forEach(c=>c.up=false);waste=[]}render()}
-$('new').onclick=init;$('decks').onchange=init;$('columns').onchange=init;init();
+$('new').onclick=init;$('decks').onchange=init;$('columns').onchange=init;
 
 /* Lompack victory: 3D card physics + seven-voice sine synthesizer */
 let audioCtx=null,celebration=null,voices=[],frameId=0;
@@ -85,5 +85,6 @@ function startCelebration(){
  frameId=requestAnimationFrame(animate);
 }
 $('celebrate').onclick=()=>startCelebration();
+init();
 
 </script></body></html>
