@@ -102,4 +102,4 @@ function monsterSmash(){
 function showDragon(){const max=Math.max(...players.map(p=>p.score)),winners=players.filter(p=>p.score===max);$('winner').textContent=winners.length===1?winners[0].name+' wins with '+max+' points!':'Tie! '+winners.map(p=>p.name).join(' & ')+' — '+max+' points each!';$('dragonScene').classList.remove('show');void $('dragonScene').offsetWidth;$('dragonScene').classList.add('show')}
 $('soundToggle').onclick=()=>{soundOn=!soundOn;$('soundToggle').textContent=soundOn?'🔊 Sound On':'🔇 Sound Off';$('soundToggle').setAttribute('aria-pressed',String(soundOn));if(master)master.gain.value=soundOn?.23:0;if(soundOn)audioReady()};$('spin').onclick=spin;$('restart').onclick=reset;$('again').onclick=reset;$('playerCount').onchange=reset;$('numberCount').onchange=reset;$('changeNumbers').onclick=changeNumbers;$('mode').onchange=reset;$('bet').oninput=updateSpin;
 reset();
-</script><script src="../audio.js?v=20261017-dance-1"></script></body></html>
+</script><script src="../audio.js?v=20261017-arrange-1"></script></body></html>
