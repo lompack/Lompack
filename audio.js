@@ -24,6 +24,23 @@ patterns.orbit={bass:[33,33,40,40,36,36,43,43],lead:[69,72,76,81,79,76,72,67],ar
 patterns.night={bass:[38,38,45,45,36,36,43,43],lead:[74,0,72,69,67,0,69,72],arp:[62,65,69,74,60,64,67,72]};
 patterns.chase={bass:[40,40,43,45,40,47,43,38],lead:[76,79,83,86,83,79,76,74],arp:[64,67,71,76,67,71,74,79]};
 patterns.dawn={bass:[41,41,48,48,45,45,48,48],lead:[77,79,81,84,81,79,77,72],arp:[65,69,72,77,69,72,76,81]};
+
+// Public-domain classical melodies, newly sequenced for this three-voice chiptune engine.
+// 0 is a rest. Melodies are simplified original arrangements, not recordings.
+const classical=[
+{id:'mozart',title:'Eine kleine Nachtmusik',mood:'Mozart · Serenade',bpm:132},
+{id:'beethoven',title:'Ode to Joy',mood:'Beethoven · Symphony No. 9',bpm:116},
+{id:'vivaldi',title:'Spring',mood:'Vivaldi · The Four Seasons',bpm:148},
+{id:'chopin',title:'Nocturne in E-flat',mood:'Chopin · Op. 9 No. 2',bpm:88},
+{id:'flower',title:'Flower Duet',mood:'Delibes · Lakmé',bpm:92}
+];
+library.push(...classical);
+patterns.mozart={bass:[43,43,38,38,40,40,38,38,43,43,38,38,40,40,38,38],lead:[67,0,74,67,74,67,74,79,78,0,76,0,74,0,72,0,72,0,76,72,76,72,76,79,77,0,76,0,74,0,72,0],arp:[55,59,62,67,50,55,59,62,52,55,60,64,50,54,57,62]};
+patterns.beethoven={bass:[48,48,43,43,45,45,43,43,48,48,43,43,48,43,48,48],lead:[64,64,65,67,67,65,64,62,60,60,62,64,64,62,62,0,64,64,65,67,67,65,64,62,60,60,62,64,62,60,60,0],arp:[60,64,67,72,55,59,62,67,57,60,64,69,55,59,62,67]};
+patterns.vivaldi={bass:[40,40,47,47,45,45,40,40,40,40,47,47,45,45,40,40],lead:[76,76,76,0,76,74,72,74,76,0,79,79,79,0,79,77,76,77,79,0,81,79,77,76,74,76,77,74,76,0,0,0],arp:[64,68,71,76,59,63,66,71,57,61,64,69,64,68,71,76]};
+patterns.chopin={bass:[39,39,46,46,44,44,46,46,39,39,46,46,44,44,46,46],lead:[70,0,74,0,77,0,82,0,81,0,77,0,74,0,72,0,70,0,72,0,74,0,77,0,75,0,74,0,72,0,70,0],arp:[63,67,70,75,58,62,65,70,56,60,63,68,58,62,65,70]};
+patterns.flower={bass:[43,43,50,50,48,48,50,50,43,43,50,50,48,48,50,50],lead:[74,0,76,0,78,0,79,0,78,0,76,0,74,0,72,0,71,0,74,0,76,0,74,0,72,0,71,0,69,0,67,0],arp:[55,59,62,67,50,54,57,62,48,52,55,60,50,54,57,62]};
+
 selected=library.some(x=>x.id===game)?game:'zolyx';
 function init(){try{if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();bus=ctx.createGain();bus.gain.value=.28;bus.connect(ctx.destination);musicBus=ctx.createGain();musicBus.gain.value=.34;musicBus.connect(bus);fxBus=ctx.createGain();fxBus.gain.value=.65;fxBus.connect(bus)}if(ctx.state==='suspended')ctx.resume();return true}catch(e){return false}}
 function note(m){return 440*Math.pow(2,(m-69)/12)}
