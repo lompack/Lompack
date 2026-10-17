@@ -1,7 +1,7 @@
 /* Lompack audio: original three-voice C64-inspired music and lightweight arcade SFX. */
 (()=>{'use strict';
 let ctx=null,bus=null,musicBus=null,fxBus=null,timer=null,step=0;
-let musicOn=false,fxOn=true,tempo=150,voices=[],nodes=[];let selected=null;
+let musicOn=false,fxOn=true,tempo=150,voices=[],nodes=[];let selected=null,radioCategory='all',shuffle=false,radioMode=false,trackStart=0;
 const $=id=>document.getElementById(id);
 const game=document.body.dataset.game||'arcade';
 const patterns={
@@ -41,6 +41,16 @@ patterns.vivaldi={bass:[40,40,47,47,45,45,40,40,40,40,47,47,45,45,40,40],lead:[7
 patterns.chopin={bass:[39,39,46,46,44,44,46,46,39,39,46,46,44,44,46,46],lead:[70,0,74,0,77,0,82,0,81,0,77,0,74,0,72,0,70,0,72,0,74,0,77,0,75,0,74,0,72,0,70,0],arp:[63,67,70,75,58,62,65,70,56,60,63,68,58,62,65,70]};
 patterns.flower={bass:[43,43,50,50,48,48,50,50,43,43,50,50,48,48,50,50],lead:[74,0,76,0,78,0,79,0,78,0,76,0,74,0,72,0,71,0,74,0,76,0,74,0,72,0,71,0,69,0,67,0],arp:[55,59,62,67,50,54,57,62,48,52,55,60,50,54,57,62]};
 
+
+const dance=[{"id":"hypno","title":"Hypno Pulse","mood":"Trance · Hypnotic pulse","bpm":144,"category":"trance"},{"id":"acid","title":"Acid Raster","mood":"Techno · Acid sequence","bpm":150,"category":"techno"},{"id":"euphoria","title":"Pixel Euphoria","mood":"Trance · Rising arpeggios","bpm":148,"category":"trance"},{"id":"machine","title":"Machine City","mood":"Techno · Driving bass","bpm":156,"category":"techno"},{"id":"strobe","title":"Strobe Runner","mood":"Techno · Fast and dark","bpm":164,"category":"techno"},{"id":"nebula","title":"Nebula Gate","mood":"Trance · Floating melody","bpm":138,"category":"trance"}];
+library.push(...dance);
+patterns.hypno={"bass":[33,33,33,33,36,33,40,33],"lead":[0,69,72,76,0,72,76,81],"arp":[57,60,64,69,60,64,69,72],"dance":true};
+patterns.acid={"bass":[33,33,45,33,36,33,43,33],"lead":[57,69,60,72,57,69,64,76],"arp":[69,72,76,72,69,64,72,76],"dance":true};
+patterns.euphoria={"bass":[36,36,43,43,45,45,40,40],"lead":[72,76,79,84,83,79,76,72],"arp":[60,64,67,72,64,67,72,76],"dance":true};
+patterns.machine={"bass":[29,29,29,41,29,36,29,41],"lead":[0,0,65,0,0,67,0,0],"arp":[53,65,56,65,53,65,60,65],"dance":true};
+patterns.strobe={"bass":[31,31,43,31,34,31,46,31],"lead":[79,0,77,0,74,0,72,0],"arp":[67,70,74,79,70,74,79,82],"dance":true};
+patterns.nebula={"bass":[38,38,45,45,41,41,48,48],"lead":[74,77,81,86,84,81,77,74],"arp":[62,65,69,74,65,69,74,77],"dance":true};
+for(const t of library)if(!t.category)t.category=['mozart','beethoven','vivaldi','chopin','flower'].includes(t.id)?'classical':(['zolyx','wheel','rps','solitaire'].includes(t.id)?'games':'chiptune');
 selected=library.some(x=>x.id===game)?game:'zolyx';
 function init(){try{if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();bus=ctx.createGain();bus.gain.value=.28;bus.connect(ctx.destination);musicBus=ctx.createGain();musicBus.gain.value=.34;musicBus.connect(bus);fxBus=ctx.createGain();fxBus.gain.value=.65;fxBus.connect(bus)}if(ctx.state==='suspended')ctx.resume();return true}catch(e){return false}}
 function note(m){return 440*Math.pow(2,(m-69)/12)}
@@ -56,14 +66,18 @@ case 'lose':blip(340,.4,'sawtooth',.15,0,110);break;
 case 'beat':blip(180,.09,'triangle',.1);break;
 case 'pickup':blip(480,.065,'sine',.08);break;
 }}
-function playStep(){if(!musicOn||!init())return;const p=patterns[selected]||patterns.zolyx,k=step++;
+function playStep(){if(!musicOn||!init())return;const p=patterns[selected]||patterns.zolyx,k=step++;if(radioMode&&performance.now()-trackStart>48000){nextTrack();return}
  blip(note(p.bass[Math.floor(k/2)%p.bass.length]),.18,'triangle',.15,0,0,musicBus);
  const m=p.lead[Math.floor(k/2)%p.lead.length];if(m&&k%2===0)blip(note(m),.19,'square',.075,0,0,musicBus);
- blip(note(p.arp[k%p.arp.length]),.08,'sawtooth',.038,0,0,musicBus);
+ blip(note(p.arp[k%p.arp.length]),p.dance?.105:.08,p.dance?'square':'sawtooth',p.dance?.07:.038,0,0,musicBus);if(p.dance){if(k%2===0)blip(110,.16,'sine',.25,0,42,musicBus);else blip(900,.025,'square',.024,0,0,musicBus);if(k%8===4)blip(290,.12,'triangle',.07,0,150,musicBus)}
 }
 function stopMusic(){musicOn=false;if(timer){clearInterval(timer);timer=null}if(musicBus&&ctx){musicBus.gain.cancelScheduledValues(ctx.currentTime);musicBus.gain.setTargetAtTime(0,ctx.currentTime,.04)}sync()}
-function chooseTrack(id){if(!patterns[id])return;selected=id;step=0;tempo=(library.find(x=>x.id===id)||{}).bpm||150;if(musicOn){if(timer)clearInterval(timer);playStep();timer=setInterval(playStep,60000/tempo/2)}sync()}
-function toggleMusic(){if(musicOn){stopMusic();return}if(!init())return;musicOn=true;step=0;tempo=(library.find(x=>x.id===selected)||{}).bpm||150;musicBus.gain.setTargetAtTime(.34,ctx.currentTime,.04);playStep();timer=setInterval(playStep,60000/tempo/2);sync()}
+function chooseTrack(id){if(!patterns[id])return;selected=id;step=0;trackStart=performance.now();tempo=(library.find(x=>x.id===id)||{}).bpm||150;if(musicOn){if(timer)clearInterval(timer);playStep();timer=setInterval(playStep,60000/tempo/2)}sync()}
+function playlist(){return library.filter(t=>radioCategory==='all'||t.category===radioCategory)}
+function nextTrack(){const list=playlist();if(!list.length)return;const i=list.findIndex(t=>t.id===selected);chooseTrack((shuffle?list[Math.floor(Math.random()*list.length)]:list[(i+1)%list.length]).id)}
+function setRadioCategory(c){radioCategory=c;radioMode=true;const list=playlist();if(list.length)chooseTrack((shuffle?list[Math.floor(Math.random()*list.length)]:list[0]).id)}
+function setShuffle(v){shuffle=!!v}
+function toggleMusic(){if(musicOn){stopMusic();return}if(!init())return;musicOn=true;step=0;trackStart=performance.now();tempo=(library.find(x=>x.id===selected)||{}).bpm||150;musicBus.gain.setTargetAtTime(.34,ctx.currentTime,.04);playStep();timer=setInterval(playStep,60000/tempo/2);sync()}
 function toggleFx(){fxOn=!fxOn;if(fxBus)fxBus.gain.value=fxOn?.65:0;sync()}
 function sync(){const sel=$('lomTrack');if(sel)sel.value=selected;const a=$('lomMusic'),b=$('lomFx');if(a){a.textContent=musicOn?'♫ Music On':'♫ Music Off';a.setAttribute('aria-pressed',String(musicOn))}if(b){b.textContent=fxOn?'🔊 FX On':'🔇 FX Off';b.setAttribute('aria-pressed',String(fxOn))}}
 const bar=document.createElement('div');bar.id='lomAudio';bar.style.cssText='display:flex;justify-content:center;gap:6px;align-items:center;padding:4px 8px;flex-wrap:wrap;font:12px system-ui;position:relative;z-index:5';
@@ -71,7 +85,7 @@ bar.innerHTML='<select id="lomTrack" aria-label="Music track" style="max-width:1
 for(const b of bar.querySelectorAll('button'))b.style.cssText='font:600 12px system-ui;padding:6px 9px;border:1px solid #a3d8c4;border-radius:8px;background:#193c49;color:#fff;cursor:pointer';
 const main=document.querySelector('main');if(main)main.prepend(bar);else document.body.prepend(bar);
 $('lomTrack').innerHTML=library.map(t=>'<option value="'+t.id+'">'+t.title+'</option>').join('');$('lomTrack').onchange=e=>chooseTrack(e.target.value);$('lomMusic').onclick=toggleMusic;$('lomFx').onclick=toggleFx;
-window.LomAudio={fx,stopMusic,toggleMusic,chooseTrack,library,get current(){return selected},get playing(){return musicOn}};
+window.LomAudio={fx,stopMusic,toggleMusic,chooseTrack,library,setRadioCategory,setShuffle,nextTrack,get current(){return selected},get playing(){return musicOn}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&musicOn)stopMusic()});
 sync();
 })();
