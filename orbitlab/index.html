@@ -1,0 +1,87 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101c32"><title>Lompack · Orbit Lab</title><style>
+*{box-sizing:border-box}body{margin:0;background:#0b1428;color:#effaff;font:15px system-ui,-apple-system,sans-serif;min-height:100dvh}header{height:45px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;background:#101f3b}header a{color:#b6f5ef;text-decoration:none}h1{font-size:18px;margin:0}main{max-width:650px;margin:auto;padding:8px;display:flex;flex-direction:column;align-items:center;gap:7px}.hud{display:flex;justify-content:space-between;align-items:center;width:100%;gap:6px;font-weight:700}.hud span{background:#172b49;padding:6px 9px;border-radius:8px}canvas{display:block;width:min(100%,56vh);max-width:550px;aspect-ratio:1;border:3px solid #54d6d0;background:#071427;touch-action:none;image-rendering:auto}.status{min-height:20px;text-align:center;font-size:13px;color:#bde8e7}.pad{display:grid;grid-template-columns:repeat(3,60px);grid-template-rows:repeat(2,46px);gap:5px;justify-content:center;touch-action:none}.pad button{border:1px solid #75dcd6;border-radius:12px;background:#193753;color:white;font-size:25px;font-weight:800;touch-action:none}.pad button:active,.pad button.pressed{background:#38a69d}.pad .up{grid-column:2;grid-row:1}.pad .left{grid-column:1;grid-row:2}.pad .down{grid-column:2;grid-row:2}.pad .right{grid-column:3;grid-row:2}.actions{display:flex;gap:9px;align-items:center}.actions button{border:0;border-radius:9px;background:#f4d478;color:#172234;padding:8px 14px;font-weight:750}.help{max-width:560px;text-align:center;font-size:12px;color:#b3c9d7;line-height:1.35}.overlay{position:fixed;inset:0;background:#061323c9;display:grid;place-items:center;z-index:10}.dialog{width:min(90vw,340px);padding:25px;background:#16344f;border:2px solid #71e7d9;border-radius:18px;text-align:center;box-shadow:0 12px 50px #0009}.dialog h2{margin:0 0 9px;font-size:30px}.dialog p{line-height:1.45}.dialog button{background:#f5d57b;border:0;border-radius:10px;padding:12px 25px;font-weight:800;font-size:16px}.hidden{display:none}@media(max-height:730px){header{height:37px}main{gap:4px;padding:4px}canvas{width:min(100%,49vh)}.pad{grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,40px)}.hud span{padding:4px 7px}.help{font-size:11px}}
+.joystick{position:relative;width:142px;height:142px;border-radius:50%;background:radial-gradient(circle,#1d4561,#102940);border:3px solid #5fc9c9;box-shadow:inset 0 5px 15px #0008,0 5px 14px #0006;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overscroll-behavior:contain;flex-shrink:0}.joystick-ring{position:absolute;inset:19px;border:2px dashed #75dcd655;border-radius:50%;pointer-events:none}.joystick-knob{position:absolute;width:64px;height:64px;left:50%;top:50%;margin-left:-32px;margin-top:-32px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#b4f9ed,#46aaa9 60%,#277477);border:2px solid #e1fff9;box-shadow:0 5px 12px #0009;pointer-events:none;transform:translate(0,0);transition:transform .09s ease-out}.joystick.engaged .joystick-knob{transition:none}@media(max-height:730px){.joystick{width:104px;height:104px}.joystick-knob{width:50px;height:50px;margin-left:-25px;margin-top:-25px}.joystick-ring{inset:13px}}body{-webkit-user-select:none;user-select:none}input{user-select:text;-webkit-user-select:text} @keyframes exercise{0%,100%{transform:translateY(13px) rotate(-6deg)}50%{transform:translateY(-20px) rotate(6deg)}}#adultOverlay select{padding:8px;border-radius:8px;background:#183951;color:white;border:1px solid #6ed4ce}</style></head><body data-game="zolyx"><header><a href="../">← Lompack</a><h1>🪐 Orbit Lab</h1></header><main><div class="hud"><span id="level">Level 1</span><span id="area">0% / 65%</span><span id="lives">♥ ♥ ♥</span></div><canvas id="board" width="600" height="600" aria-label="Orbit Lab game board"></canvas><div class="status" id="status">◉ ↗ ↘ ◉</div><div id="rule" style="font-size:23px;min-height:28px">↗ ↘</div><div class="joystick" id="joystick" aria-label="Touch joystick"><div class="joystick-ring"></div><div class="joystick-knob" id="joystickKnob"></div></div><div class="actions"><label for="target" style="font-size:13px">Cleared <select id="target" style="background:#193753;color:white;border:1px solid #75dcd6;border-radius:8px;padding:7px"><option value="65">65%</option><option value="75">75%</option><option value="80">80%</option><option value="85">85%</option><option value="90">90%</option><option value="95">95%</option><option value="99">99%</option></select></label><button id="pause">Pause</button><button id="restart">New Game</button><button id="adult">⚙️</button></div><div class="help">Watch the moving shapes. Discover a new movement pattern each level. Try, observe, try again.</div></main><div id="breakOverlay" class="overlay hidden" style="z-index:30;background:#102b3df5"><div class="dialog"><div style="font-size:25px">🌿 ✨ 🌿</div><div id="activityIcon" style="font-size:100px;animation:exercise 1s ease-in-out infinite">🤸</div><div id="activityText" style="font-size:26px">⬆️ ⬇️</div><div id="breakClock" style="font-size:37px;font-weight:800;color:#f5d57b">02:00</div><div style="height:9px;border-radius:8px;background:#ffffff33;overflow:hidden"><div id="breakProgress" style="height:100%;width:0;background:#f5d57b"></div></div></div></div><div id="adultOverlay" class="overlay hidden" style="z-index:40"><div class="dialog"><h2>⚙️ Grown-ups</h2><label>Play time <select id="playMinutes"><option value="1">1 min</option><option value="3">3 min</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option><option value="30">30 min</option></select></label><p><label>Movement break <select id="restMinutes"><option value="1">1 min</option><option value="2">2 min</option><option value="3">3 min</option><option value="5">5 min</option><option value="10">10 min</option></select></label></p><button id="saveAdult">Save ✓</button></div></div><div class="overlay" id="overlay"><div class="dialog"><h2 id="dialogTitle">ORBIT LAB</h2><p id="dialogText">Claim your chosen percentage of the field. Avoid the bouncing balls while drawing a line!</p><button id="dialogButton">Play</button></div></div><script>
+const $=id=>document.getElementById(id),canvas=$('board'),ctx=canvas.getContext('2d'),N=60,S=600/N,EMPTY=0,SAFE=1,TRAIL=2;
+let grid,player,balls=[],level=1,lives=3,area=0,mode='menu',last=0,acc=0,moveAcc=0,held=null,dialogAction=null,invuln=0,secretStage=0;
+let gems=0,sessionMinutes=Number(localStorage.getItem('orbitSession')||5),restMinutes=Number(localStorage.getItem('orbitRest')||2),sessionEnd=0,restEnd=0,onBreak=false,adultOpen=false,activityCount=0,previousMode='menu';
+const rules=['↗ ↘','◯ ↻','↔ ↕','⚡ ↗','◯ + ↗'];
+const dirs={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+function cell(x,y){return x<0||y<0||x>=N||y>=N?SAFE:grid[y*N+x]}
+function setCell(x,y,v){if(x>=0&&y>=0&&x<N&&y<N)grid[y*N+x]=v}
+function makeLevel(){grid=new Uint8Array(N*N);for(let i=0;i<N;i++){setCell(i,0,SAFE);setCell(i,N-1,SAFE);setCell(0,i,SAFE);setCell(N-1,i,SAFE)}player={x:Math.floor(N/2),y:0,trail:[],drawing:false};balls=[];for(let i=0;i<Math.min(2+Math.floor((level-1)/3),5);i++){let x=8+Math.random()*(N-16),y=8+Math.random()*(N-16),angle=Math.random()*Math.PI*2,speed=7+level*.24;balls.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:.72,theta:angle,kind:level%5===2&&i===0?'orbit':level%5===3&&i===0?'axis':'bounce'})}$('rule').textContent=rules[(level-1)%5];area=0;invuln=0;updateHud()}
+function updateHud(){$('level').textContent='Level '+level+' ✦'+gems;$('area').textContent=Math.floor(area*100)+'% / '+$('target').value+'%';$('lives').textContent='♥ '.repeat(Math.max(0,lives))}
+function showDialog(title,msg,button,fn){secretStage=0;mode='menu';$('dialogTitle').textContent=title;$('dialogText').textContent=msg;$('dialogButton').textContent=button;dialogAction=fn;$('overlay').classList.remove('hidden')}
+function play(){mode='playing';$('overlay').classList.add('hidden');last=performance.now();acc=0;moveAcc=0}
+function newGame(){level=1;lives=3;gems=0;makeLevel();play()}
+function secretContinue(){lives=3;invuln=2;held=null;updateHud();$('status').textContent='Back in the game! ♥ ♥ ♥';play()}
+// Secret: on GAME OVER tap GAME, then OVER. No visible cheat button.
+function fail(){window.LomAudio?.fx('hurt');if(!player.drawing||invuln>0)return;for(const [x,y] of player.trail)setCell(x,y,EMPTY);player.trail=[];player.drawing=false;lives--;updateHud();$('status').textContent='Trail hit! −1 life';player.x=Math.floor(N/2);player.y=0;invuln=1.2;if(lives<=0){showDialog('GAME OVER','You reached level '+level+'. Captured '+Math.floor(area*100)+'%.','Try Again',newGame);$('dialogTitle').innerHTML='<span id="secretGame">GAME</span> <span id="secretOver">OVER</span>'; $('secretGame').onclick=()=>{secretStage=1};$('secretOver').onclick=()=>{if(secretStage===1){secretStage=0;secretContinue()}else secretStage=0}}}
+function fillCaptured(){window.LomAudio?.fx('capture');
+ // Flood from all balls through empty cells. All unreachable empty regions are claimed.
+ const reachable=new Uint8Array(N*N),queue=new Int32Array(N*N);let head=0,tail=0;
+ for(const b of balls){const x=Math.max(1,Math.min(N-2,Math.floor(b.x))),y=Math.max(1,Math.min(N-2,Math.floor(b.y)));const idx=y*N+x;if(grid[idx]===EMPTY&&!reachable[idx]){reachable[idx]=1;queue[tail++]=idx}}
+ while(head<tail){const id=queue[head++],x=id%N,y=(id/N)|0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,ni=ny*N+nx;if(nx>0&&ny>0&&nx<N-1&&ny<N-1&&grid[ni]===EMPTY&&!reachable[ni]){reachable[ni]=1;queue[tail++]=ni}}}
+ let claimed=0;for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++){const i=y*N+x;if(grid[i]===TRAIL||(grid[i]===EMPTY&&!reachable[i]))grid[i]=SAFE;if(grid[i]===SAFE)claimed++}
+ player.trail=[];player.drawing=false;area=claimed/((N-2)*(N-2));updateHud();
+ if(area>=Number($('target').value)/100){gems++;window.LomAudio?.fx('level');mode='menu';showDialog('✦ ✦ ✦','⭐ ✦ ⭐  '+Math.floor(area*100)+'%  ⭐ ✦ ⭐','Next Level',()=>{level++;makeLevel();play()})}
+ else $('status').textContent=Math.floor(area*100)+'% captured — keep going!';
+}
+function move(dx,dy){if(mode!=='playing')return;const nx=player.x+dx,ny=player.y+dy;if(nx<0||ny<0||nx>=N||ny>=N)return;const next=cell(nx,ny);if(next===TRAIL)return;
+ if(player.drawing){if(next===SAFE){player.x=nx;player.y=ny;fillCaptured()}else{player.x=nx;player.y=ny;setCell(nx,ny,TRAIL);player.trail.push([nx,ny]);for(const b of balls)if(Math.hypot(b.x-(nx+.5),b.y-(ny+.5))<b.r+0.6){fail();break}}}
+ else if(next===SAFE){player.x=nx;player.y=ny}
+ else{window.LomAudio?.fx('draw');player.drawing=true;player.x=nx;player.y=ny;setCell(nx,ny,TRAIL);player.trail.push([nx,ny])}
+}
+function physics(dt){
+ invuln=Math.max(0,invuln-dt);
+ for(const b of balls){
+  if(b.kind==='orbit'){b.theta+=dt*(.8+level*.03);b.vx=Math.cos(b.theta)*8;b.vy=Math.sin(b.theta)*8}
+  if(b.kind==='axis'){if(Math.abs(b.vx)>Math.abs(b.vy))b.vy=0;else b.vx=0}
+  // Microsteps prevent balls tunneling through thin captured lines.
+  const steps=Math.max(1,Math.ceil(Math.max(Math.abs(b.vx),Math.abs(b.vy))*dt/.22)),h=dt/steps;
+  for(let k=0;k<steps;k++){
+   let nx=b.x+b.vx*h,ny=b.y+b.vy*h;
+   if(cell(Math.floor(nx+(b.vx>0?b.r:-b.r)),Math.floor(b.y))===SAFE){b.vx*=-1;nx=b.x+b.vx*h}
+   if(cell(Math.floor(b.x),Math.floor(ny+(b.vy>0?b.r:-b.r)))===SAFE){b.vy*=-1;ny=b.y+b.vy*h}
+   b.x=Math.max(1.1,Math.min(N-1.1,nx));b.y=Math.max(1.1,Math.min(N-1.1,ny));
+   if(player.drawing){const cx=Math.floor(b.x),cy=Math.floor(b.y);let hit=false;for(let yy=cy-1;yy<=cy+1&&!hit;yy++)for(let xx=cx-1;xx<=cx+1;xx++)if(cell(xx,yy)===TRAIL&&Math.hypot(b.x-(xx+.5),b.y-(yy+.5))<b.r+.65){hit=true;break}if(hit){fail();break}}
+  }
+ }
+}
+function draw(){
+ ctx.fillStyle='#071427';ctx.fillRect(0,0,600,600);
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){const v=grid[y*N+x];if(v){ctx.fillStyle=v===SAFE?'#225d84':'#ffd878';ctx.fillRect(x*S,y*S,S,S)}}
+ ctx.strokeStyle='#ffffff0b';ctx.lineWidth=.5;for(let i=0;i<=N;i+=5){ctx.beginPath();ctx.moveTo(i*S,0);ctx.lineTo(i*S,600);ctx.moveTo(0,i*S);ctx.lineTo(600,i*S);ctx.stroke()}
+ for(const b of balls){const x=b.x*S,y=b.y*S;ctx.beginPath();ctx.arc(x,y,b.r*S,0,Math.PI*2);ctx.fillStyle='#ff675f';ctx.shadowColor='#ff827b';ctx.shadowBlur=15;ctx.fill();ctx.shadowBlur=0;ctx.beginPath();ctx.arc(x-2,y-2,2.4,0,Math.PI*2);ctx.fillStyle='#fff3e1';ctx.fill()}
+ if(invuln===0||Math.floor(invuln*10)%2===0){ctx.beginPath();ctx.arc((player.x+.5)*S,(player.y+.5)*S,7,0,Math.PI*2);ctx.fillStyle='#f3ff79';ctx.shadowColor='#f4ff81';ctx.shadowBlur=14;ctx.fill();ctx.shadowBlur=0}
+}
+function frame(now){const dt=Math.min(.045,(now-last)/1000||0);last=now;if(mode==='playing'){acc+=dt;moveAcc+=dt;while(acc>=1/120){physics(1/120);acc-=1/120}if(held&&moveAcc>=.07){move(...dirs[held]);moveAcc=0}}if(grid)draw();requestAnimationFrame(frame)}
+$('dialogButton').onclick=()=>dialogAction?.();$('restart').onclick=()=>showDialog('New Game?','Start again at level 1 with 3 lives?','Restart',newGame);
+$('target').onchange=()=>{updateHud();if(mode==='playing'&&area>=Number($('target').value)/100){showDialog('LEVEL COMPLETE!','You captured '+Math.floor(area*100)+'%! Level '+(level+1)+' adds another ball.','Next Level',()=>{level++;makeLevel();play()})}};
+$('pause').onclick=()=>{if(mode==='playing')showDialog('PAUSED','Take a break. Your progress is safe.','Resume',play)};
+const joystick=$('joystick'),knob=$('joystickKnob');let joyPointer=null;
+function joystickMove(e){
+ if(joyPointer!==e.pointerId)return;
+ const rect=joystick.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+ const dx=e.clientX-cx,dy=e.clientY-cy,dist=Math.hypot(dx,dy),limit=rect.width*.28;
+ const ratio=dist>limit?limit/dist:1;knob.style.transform='translate('+(dx*ratio)+'px,'+(dy*ratio)+'px)';
+ if(dist<rect.width*.13){held=null;return}
+ const dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');
+ if(held!==dir){held=dir;move(...dirs[dir]);moveAcc=0}
+}
+joystick.addEventListener('pointerdown',e=>{e.preventDefault();if(joyPointer!==null)return;joyPointer=e.pointerId;joystick.classList.add('engaged');joystick.setPointerCapture(e.pointerId);joystickMove(e)});
+joystick.addEventListener('pointermove',e=>{if(joyPointer!==e.pointerId)return;e.preventDefault();joystickMove(e)});
+function releaseJoystick(e){if(joyPointer!==e.pointerId)return;joyPointer=null;held=null;knob.style.transform='translate(0,0)';joystick.classList.remove('engaged')}
+for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(type,releaseJoystick);
+joystick.addEventListener('contextmenu',e=>e.preventDefault());
+const keyDirs={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'};
+document.addEventListener('keydown',e=>{const dir=keyDirs[e.key];if(dir){e.preventDefault();if(held!==dir){held=dir;move(...dirs[dir]);moveAcc=0}}});document.addEventListener('keyup',e=>{if(keyDirs[e.key]===held)held=null});window.addEventListener('blur',()=>held=null);
+const activities=[['🏃','💨 ➜'],['🤸','⬆️ ⬇️'],['🕺','🎵 ✨'],['🙆','↔️ ↕️'],['🚶','🌳 💨']];
+function fmtTime(ms){const n=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
+function beginRest(){onBreak=true;previousMode=mode;mode='break';restEnd=Date.now()+restMinutes*60000;const a=activities[activityCount++%activities.length];$('activityIcon').textContent=a[0];$('activityText').textContent=a[1];$('breakOverlay').classList.remove('hidden');held=null}
+function endRest(){onBreak=false;$('breakOverlay').classList.add('hidden');mode=previousMode;sessionEnd=Date.now()+sessionMinutes*60000;last=performance.now()}
+setInterval(()=>{if(adultOpen)return;const now=Date.now();if(!onBreak&&sessionEnd&&now>=sessionEnd)beginRest();if(onBreak){const left=restEnd-now;$('breakClock').textContent=fmtTime(left);$('breakProgress').style.width=Math.min(100,Math.max(0,100*(1-left/(restMinutes*60000))))+'%';if(left<=0)endRest()}},250);
+$('playMinutes').value=String(sessionMinutes);$('restMinutes').value=String(restMinutes);
+$('adult').onclick=()=>{if(onBreak)return;adultOpen=true;previousMode=mode;mode='settings';$('adultOverlay').classList.remove('hidden')};
+$('saveAdult').onclick=()=>{sessionMinutes=Number($('playMinutes').value);restMinutes=Number($('restMinutes').value);localStorage.setItem('orbitSession',sessionMinutes);localStorage.setItem('orbitRest',restMinutes);$('adultOverlay').classList.add('hidden');adultOpen=false;mode=previousMode;sessionEnd=Date.now()+sessionMinutes*60000;last=performance.now()};
+makeLevel();requestAnimationFrame(frame);dialogAction=newGame;sessionEnd=Date.now()+sessionMinutes*60000;
+</script><script src="../audio.js?v=20261017-arrange-1"></script></body></html>
