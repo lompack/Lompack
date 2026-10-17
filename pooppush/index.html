@@ -4,10 +4,20 @@
 const $=id=>document.getElementById(id);let mode=1,players=[],turn=0,holding=false,power=0,maxPower=100,holdStart=0,raf=0,finished=false,unlocked=false,activeRisk=0;const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 let audioCtx=null,musicOn=true,musicTimer=null,musicStep=0,tensionOsc=null,tensionGain=null;
 function sound(freq,duration=.15,type='sine',volume=.07,slide=null){if(!musicOn)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration+.01)}catch(e){}}
-function poopPop(amount){if(!musicOn||amount<=0)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();const t=audioCtx.currentTime;const size=clamp(amount/100,0,1);const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),filter=audioCtx.createBiquadFilter();osc.type='sawtooth';osc.frequency.setValueAtTime(270+size*110,t);osc.frequency.exponentialRampToValueAtTime(55+size*20,t+.16+size*.24);filter.type='lowpass';filter.frequency.value=650;gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.018+size*.16,t+.018);gain.gain.exponentialRampToValueAtTime(.0001,t+.2+size*.25);osc.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);osc.start(t);osc.stop(t+.23+size*.25)}catch(e){}}
-function startMusic(){if(musicTimer)return;musicTimer=setInterval(()=>{if(!musicOn||!unlocked)return;const notes=[130.81,164.81,196,164.81,146.83,174.61,220,174.61];const f=notes[musicStep%8];sound(f,.28,'triangle',.018);if(musicStep%4===0)sound(f/2,.24,'sine',.03);if(musicStep%2===0)sound(650,.035,'triangle',.008);musicStep++},280)}
+function poopPop(amount){if(!musicOn||amount<=0)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();const t=audioCtx.currentTime;const size=clamp(amount/100,0,1);const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),filter=audioCtx.createBiquadFilter();osc.type='sawtooth';osc.frequency.setValueAtTime(190+size*75,t);osc.frequency.exponentialRampToValueAtTime(38+size*15,t+.21+size*.28);filter.type='lowpass';filter.frequency.value=650;gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.018+size*.16,t+.018);gain.gain.exponentialRampToValueAtTime(.0001,t+.28+size*.29);osc.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);osc.start(t);osc.stop(t+.31+size*.29)}catch(e){}}
+function startMusic(){if(musicTimer)return;
+ const notes=[130.81,164.81,196,164.81,146.83,174.61,220,174.61];
+ // Swing/shuffle: alternating long-short eighth notes (roughly 2:1).
+ // Recursive timeout lets the note spacing genuinely swing, not just the accents.
+ function beat(){if(!musicOn||!unlocked){musicTimer=setTimeout(beat,190);return}
+ const f=notes[musicStep%8];sound(f,.25,'triangle',.018);
+ if(musicStep%4===0)sound(f/2,.22,'sine',.027);
+ if(musicStep%2===0)sound(650,.035,'triangle',.008);
+ const delay=musicStep%2===0?355:175;
+ musicStep++;musicTimer=setTimeout(beat,delay)}
+ musicTimer=setTimeout(beat,0)}
 function startTension(){if(!musicOn)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();tensionOsc=audioCtx.createOscillator();tensionGain=audioCtx.createGain();tensionOsc.type='sawtooth';tensionOsc.frequency.value=100;tensionGain.gain.value=.0001;tensionOsc.connect(tensionGain);tensionGain.connect(audioCtx.destination);tensionOsc.start()}catch(e){}}
-function updateTension(v){if(!tensionOsc)return;const t=audioCtx.currentTime;tensionOsc.frequency.setTargetAtTime(105+v*5.8,t,.035);tensionGain.gain.setTargetAtTime(.002+v/100*.035,t,.035)}
+function updateTension(v){if(!tensionOsc)return;const t=audioCtx.currentTime;tensionOsc.frequency.setTargetAtTime(105+v*5.8,t,.035);tensionGain.gain.setTargetAtTime(.001+v/100*.014,t,.035)}
 function stopTension(){if(!tensionOsc)return;try{tensionOsc.stop();tensionOsc.disconnect();tensionGain.disconnect()}catch(e){}tensionOsc=null;tensionGain=null}
 $('audioToggle').onclick=()=>{musicOn=!musicOn;$('audioToggle').textContent=musicOn?'🔊 Music on':'🔇 Music off';if(!musicOn)stopTension()};
 function fresh(){players=Array.from({length:mode},()=>({bowel:1000,pushes:0,hems:0,max:100,score:0}));turn=0;finished=false;power=0;holding=false;$('end').classList.add('hidden');update()}
