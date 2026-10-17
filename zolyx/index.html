@@ -70,4 +70,4 @@ joystick.addEventListener('contextmenu',e=>e.preventDefault());
 const keyDirs={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'};
 document.addEventListener('keydown',e=>{const dir=keyDirs[e.key];if(dir){e.preventDefault();if(held!==dir){held=dir;move(...dirs[dir]);moveAcc=0}}});document.addEventListener('keyup',e=>{if(keyDirs[e.key]===held)held=null});window.addEventListener('blur',()=>held=null);
 makeLevel();requestAnimationFrame(frame);dialogAction=newGame;
-</script><script src="../audio.js?v=20261017-classical-2"></script></body></html>
+</script><script src="../audio.js?v=20261017-dance-1"></script></body></html>
