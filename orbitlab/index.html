@@ -84,4 +84,4 @@ $('playMinutes').value=String(sessionMinutes);$('restMinutes').value=String(rest
 $('adult').onclick=()=>{if(onBreak)return;adultOpen=true;previousMode=mode;mode='settings';$('adultOverlay').classList.remove('hidden')};
 $('saveAdult').onclick=()=>{sessionMinutes=Number($('playMinutes').value);restMinutes=Number($('restMinutes').value);localStorage.setItem('orbitSession',sessionMinutes);localStorage.setItem('orbitRest',restMinutes);$('adultOverlay').classList.add('hidden');adultOpen=false;mode=previousMode;sessionEnd=Date.now()+sessionMinutes*60000;last=performance.now()};
 makeLevel();requestAnimationFrame(frame);dialogAction=newGame;sessionEnd=Date.now()+sessionMinutes*60000;
-</script><script src="../audio.js?v=20261017-arrange-1"></script><script src="../share.js?v=20261018-1" defer></script></body></html>
+</script><script src="../audio.js?v=20261019-genres-1"></script><script src="../share.js?v=20261018-1" defer></script></body></html>
