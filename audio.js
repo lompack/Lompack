@@ -1,7 +1,7 @@
 /* Lompack audio: original three-voice C64-inspired music and lightweight arcade SFX. */
 (()=>{'use strict';
 let ctx=null,bus=null,musicBus=null,fxBus=null,timer=null,step=0;
-let musicOn=false,fxOn=true,tempo=150,voices=[],nodes=[];let selected=null,radioCategory='all',shuffle=false,radioMode=false,trackStart=0;
+let musicOn=false,fxOn=true,tempo=150,voices=[],nodes=[];let selected=null,radioCategory='all',shuffle=true,radioMode=true,trackStart=0,lastTrack=null;
 const $=id=>document.getElementById(id);
 const game=document.body.dataset.game||'arcade';
 const patterns={
@@ -98,17 +98,17 @@ function playStep(){if(!musicOn||!init())return;
 function stopMusic(){musicOn=false;if(timer){clearInterval(timer);timer=null}if(musicBus&&ctx){musicBus.gain.cancelScheduledValues(ctx.currentTime);musicBus.gain.setTargetAtTime(0,ctx.currentTime,.04)}sync()}
 function chooseTrack(id){if(!patterns[id])return;selected=id;step=0;variationSeed=Math.floor(Math.random()*100000)+1;trackStart=performance.now();tempo=(library.find(x=>x.id===id)||{}).bpm||150;if(musicOn){if(timer)clearInterval(timer);playStep();timer=setInterval(playStep,60000/tempo/2)}sync()}
 function playlist(){return library.filter(t=>radioCategory==='all'||t.category===radioCategory)}
-function nextTrack(){const list=playlist();if(!list.length)return;const i=list.findIndex(t=>t.id===selected);chooseTrack((shuffle?list[Math.floor(Math.random()*list.length)]:list[(i+1)%list.length]).id)}
-function setRadioCategory(c){radioCategory=c;radioMode=true;const list=playlist();if(list.length)chooseTrack((shuffle?list[Math.floor(Math.random()*list.length)]:list[0]).id)}
+function nextTrack(){const list=playlist();if(!list.length)return;let pool=list.filter(t=>t.id!==selected);if(!pool.length)pool=list;chooseTrack(pool[Math.floor(Math.random()*pool.length)].id)}
+function setRadioCategory(c){radioCategory=c;radioMode=true;const list=playlist();if(list.length)chooseTrack(list[Math.floor(Math.random()*list.length)].id);const sel=$('lomCategory');if(sel)sel.value=c}
 function setShuffle(v){shuffle=!!v}
-function toggleMusic(){if(musicOn){stopMusic();return}if(!init())return;musicOn=true;step=0;variationSeed=Math.floor(Math.random()*100000)+1;trackStart=performance.now();tempo=(library.find(x=>x.id===selected)||{}).bpm||150;musicBus.gain.setTargetAtTime(.34,ctx.currentTime,.04);playStep();timer=setInterval(playStep,60000/tempo/2);sync()}
+function toggleMusic(){if(musicOn){stopMusic();return}if(!init())return;const list=playlist();if(list.length)selected=list[Math.floor(Math.random()*list.length)].id;musicOn=true;step=0;variationSeed=Math.floor(Math.random()*100000)+1;trackStart=performance.now();tempo=(library.find(x=>x.id===selected)||{}).bpm||150;musicBus.gain.setTargetAtTime(.34,ctx.currentTime,.04);playStep();timer=setInterval(playStep,60000/tempo/2);sync()}
 function toggleFx(){fxOn=!fxOn;if(fxBus)fxBus.gain.value=fxOn?.65:0;sync()}
-function sync(){const sel=$('lomTrack');if(sel)sel.value=selected;const a=$('lomMusic'),b=$('lomFx');if(a){a.textContent=musicOn?'♫ Music On':'♫ Music Off';a.setAttribute('aria-pressed',String(musicOn))}if(b){b.textContent=fxOn?'🔊 FX On':'🔇 FX Off';b.setAttribute('aria-pressed',String(fxOn))}}
+function sync(){const sel=$('lomCategory');if(sel)sel.value=radioCategory;const a=$('lomMusic'),b=$('lomFx');if(a){a.textContent=musicOn?'♫ Music On':'♫ Music Off';a.setAttribute('aria-pressed',String(musicOn))}if(b){b.textContent=fxOn?'🔊 FX On':'🔇 FX Off';b.setAttribute('aria-pressed',String(fxOn))}}
 const bar=document.createElement('div');bar.id='lomAudio';bar.style.cssText='display:flex;justify-content:center;gap:6px;align-items:center;padding:4px 8px;flex-wrap:wrap;font:12px system-ui;position:relative;z-index:5';
-bar.innerHTML='<select id="lomTrack" aria-label="Music track" style="max-width:160px;font:12px system-ui;padding:6px;border-radius:8px;background:#193c49;color:white;border:1px solid #a3d8c4"></select><button id="lomMusic" type="button">♫ Music Off</button><button id="lomFx" type="button">🔊 FX On</button><span style="opacity:.65;font-size:10px">C64-inspired · original music</span>';
+bar.innerHTML='<select id="lomCategory" aria-label="Music category" style="max-width:145px;font:12px system-ui;padding:6px;border-radius:8px;background:#193c49;color:white;border:1px solid #a3d8c4"><option value="all">All music</option><option value="trance">Trance</option><option value="techno">Techno</option><option value="classical">Classical</option><option value="games">Game themes</option><option value="chiptune">Chiptune</option></select><button id="lomMusic" type="button">♫ Music Off</button><button id="lomFx" type="button">🔊 FX On</button><span style="opacity:.65;font-size:10px">C64-inspired · original music</span>';
 for(const b of bar.querySelectorAll('button'))b.style.cssText='font:600 12px system-ui;padding:6px 9px;border:1px solid #a3d8c4;border-radius:8px;background:#193c49;color:#fff;cursor:pointer';
 const main=document.querySelector('main');if(main)main.prepend(bar);else document.body.prepend(bar);
-$('lomTrack').innerHTML=library.map(t=>'<option value="'+t.id+'">'+t.title+'</option>').join('');$('lomTrack').onchange=e=>chooseTrack(e.target.value);$('lomMusic').onclick=toggleMusic;$('lomFx').onclick=toggleFx;
+$('lomCategory').onchange=e=>setRadioCategory(e.target.value);$('lomMusic').onclick=toggleMusic;$('lomFx').onclick=toggleFx;
 window.LomAudio={fx,stopMusic,toggleMusic,chooseTrack,library,setRadioCategory,setShuffle,nextTrack,get current(){return selected},get playing(){return musicOn}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&musicOn)stopMusic()});
 sync();
