@@ -49,6 +49,6 @@ if(mode==='hit'){person(thiefX,FLOOR,true,true);rect(thiefX+48,FLOOR-30,28,25,'#
 if(shoe){g.save();g.translate(shoe.x,shoe.y);g.rotate(shoe.rot);ellipse(0,0,28,12,'#fce1a3');rect(-18,-12,28,12,'#f7b7c6');rect(-27,6,54,7,'#d97d8e');g.restore()}else if(mode==='run'&&holding){g.save();g.translate(LADY+49,315);g.rotate(-.4);ellipse(0,0,26,10,'#ffe0a0');rect(-15,-12,25,10,'#f7b7c6');g.restore()}
 for(const p of particles)rect(p.x,p.y,5,5,p.life%2?'#fce69e':'#fff');
 g.restore();if(mode==='run'&&holding){g.fillStyle='#fff';g.font='bold 23px system-ui';g.textAlign='center';g.fillText(Math.round(charge*100)+'%',W/2,95)}g.restore()}
-let last=0,acc=0;function loop(t){acc+=Math.min(40,t-last||16.67);last=t;let n=0;while(acc>=16.667&&n++<3){update();acc-=16.667}draw();requestAnimationFrame(loop)}hud();requestAnimationFrame(loop);
+let last=0,acc=0;function loop(t){acc+=Math.min(40,t-last||16.67);last=t;let n=0;while(acc>=16.667&&n++<3){update();acc-=16.667}draw();requestAnimationFrame(loop)}$('start').onclick=start;hud();requestAnimationFrame(loop);
 })();
 </script><script src="../share.js?v=20261018-1" defer></script></body></html>
