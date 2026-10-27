@@ -41,8 +41,24 @@
 @keyframes arcadeBlink{50%{opacity:.3}}@keyframes arcadeHop{50%{transform:translateY(-42%)}}@keyframes arcadeShoe{50%{transform:translate(-20%,-35%) rotate(-25deg)}}
 @media(max-width:600px){.arcade-scene{aspect-ratio:4/5}.arcade-sign{top:6%;left:31%;width:38%;font-size:clamp(20px,6vw,32px)}.gear-rack{top:18%;height:32%;width:25%;font-size:clamp(16px,5vw,26px);grid-template-columns:repeat(2,1fr)}.arcade-window{top:20%;left:33%;width:34%;height:30%}.arcade-floor{inset:54% 0 0}.arcade-machine{bottom:15%;height:34%;width:25%;border-width:3px}.slot{left:10%}.runner-cabinet{left:38%}.thief-booth{left:66%}.arcade-machine .machine-marquee{font-size:clamp(9px,2.8vw,13px)}.arcade-machine .machine-cta{font-size:clamp(8px,2.5vw,12px)}.arcade-npc{bottom:47%;width:20%;height:31%}.arcade-npc.jan{left:22%}.arcade-npc.preben{left:59%}.npc-hot{bottom:46%;height:33%;width:25%}.npc-hot.jan-hot{left:19%}.npc-hot.preben-hot{left:56%}.npc-hot span{font-size:clamp(10px,2.8vw,13px)}.arcade-scene .bagbtn{font-size:11px;padding:5px}.gear-rack{opacity:.78}}
 @media(prefers-reduced-motion:reduce){.arcade-scene *{animation:none!important;transition:none!important}}
+
+/* Photo entrance: keep existing CSS arcade as fallback until photo asset is uploaded. */
+.arcade-scene .arcade-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:7;pointer-events:none;display:none;background:#2b2925}
+.arcade-scene.has-arcade-photo{aspect-ratio:1672/941;background:#2b2925}
+.arcade-scene.has-arcade-photo .arcade-photo{display:block}
+.arcade-scene.has-arcade-photo .arcade-wall,.arcade-scene.has-arcade-photo .arcade-sign,.arcade-scene.has-arcade-photo .arcade-window,.arcade-scene.has-arcade-photo .gear-rack,.arcade-scene.has-arcade-photo .arcade-floor,.arcade-scene.has-arcade-photo .arcade-npc,.arcade-scene.has-arcade-photo .npc-hot span,.arcade-scene.has-arcade-photo .arcade-machine>*{display:none}
+.arcade-scene.has-arcade-photo .arcade-machine{z-index:9;background:transparent;box-shadow:none;border:0;border-radius:0;bottom:19%;height:58%;width:17%;opacity:1}
+.arcade-scene.has-arcade-photo .arcade-machine.slot{left:27%}
+.arcade-scene.has-arcade-photo .arcade-machine.runner-cabinet{left:44%}
+.arcade-scene.has-arcade-photo .arcade-machine.thief-booth{left:61%}
+.arcade-scene.has-arcade-photo .arcade-machine:hover,.arcade-scene.has-arcade-photo .arcade-machine:focus-visible{background:#ffe36b30;outline:3px solid #ffe36b;outline-offset:-3px;transform:none}
+.arcade-scene.has-arcade-photo .npc-hot{z-index:9;bottom:5%;height:74%;width:24%}
+.arcade-scene.has-arcade-photo .npc-hot.jan-hot{left:0}
+.arcade-scene.has-arcade-photo .npc-hot.preben-hot{left:76%}
+.arcade-scene.has-arcade-photo .bagbtn{z-index:10}
+@media(max-width:600px){.arcade-scene.has-arcade-photo{aspect-ratio:1672/941;min-height:0}.arcade-scene.has-arcade-photo .arcade-machine{bottom:19%;height:58%;width:17%}.arcade-scene.has-arcade-photo .arcade-machine.slot{left:27%}.arcade-scene.has-arcade-photo .arcade-machine.runner-cabinet{left:44%}.arcade-scene.has-arcade-photo .arcade-machine.thief-booth{left:61%}.arcade-scene.has-arcade-photo .npc-hot{bottom:5%;height:74%;width:24%}.arcade-scene.has-arcade-photo .npc-hot.jan-hot{left:0}.arcade-scene.has-arcade-photo .npc-hot.preben-hot{left:76%}}
 </style></head><body><div id="gate"><form id="login"><h1>👋 HEI, BUA!</h1><p>En spillportal som gir lyst til å finne på noe.</p><input id="pass" type="password" placeholder="Passord" inputmode="numeric" aria-label="Passord" required><button class="primary">GÅ INN</button><small id="loginError"></small></form></div><header><strong>👋 HEI, BUA!</strong><small>SPILLTEST 1.0</small></header><main class="app"><section id="home"><div class="scene arcade-scene" id="arcadeScene">
-<div class="arcade-wall"></div><div class="arcade-sign">BUA <small>LEK • LÅN • OPPLEV</small></div>
+<img class="arcade-photo" src="bua-arkade-apningsbilde.jpg" alt="BUA-lokalet med Jan Erik, Preben og tre spillmaskiner" onload="this.parentElement.classList.add('has-arcade-photo')" onerror="this.remove()"><div class="arcade-wall"></div><div class="arcade-sign">BUA <small>LEK • LÅN • OPPLEV</small></div>
 <div class="arcade-window"><span>🏔️</span></div>
 <div class="gear-rack left-gear" aria-hidden="true"><span>🎿</span><span>🎸</span><span>🏂</span><span>🎺</span><span>🏓</span><span>🎻</span></div>
 <div class="gear-rack right-gear" aria-hidden="true"><span>🚲</span><span>🛹</span><span>🥁</span><span>⛺</span><span>🎒</span><span>🏀</span></div>
