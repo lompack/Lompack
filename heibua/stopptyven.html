@@ -61,6 +61,6 @@ function buaAdd(item){let bag=[];try{bag=JSON.parse(localStorage.getItem('heibua
 function buaResult(item,message,points,resume){buaCurrent=item;buaResume=resume;document.getElementById('buaIcon').textContent=item[1];document.getElementById('buaMessage').textContent=message;document.getElementById('buaPoints').textContent=points;document.getElementById('buaSave').textContent='🎒 Legg i sekken';document.getElementById('buaPick').classList.add('show')}
 function buaClose(){document.getElementById('buaPick').classList.remove('show');if(buaResume)buaResume()}
 document.getElementById('buaSave').onclick=()=>{buaAdd(buaCurrent);document.getElementById('buaSave').textContent='✓ I sekken'};
-document.getElementById('buaLeave').onclick=buaClose;document.getElementById('buaNext').onclick=buaClose;
+document.getElementById('buaLeave').onclick=buaClose;document.getElementById('buaNext').onclick=buaClose;document.getElementById('buaPick').addEventListener('pointerdown',e=>{if(e.target===e.currentTarget){e.preventDefault();buaClose()}});
 document.getElementById('buaShare').onclick=async()=>{const msg=document.getElementById('buaMessage').textContent+' '+document.getElementById('buaPoints').textContent;const url=location.href;if(navigator.share){try{await navigator.share({title:'BUA-spillet',text:msg,url})}catch(e){}}else{try{await navigator.clipboard.writeText(msg+' '+url);alert('Kopiert!')}catch(e){prompt('Del:',msg+' '+url)}}};
 </script></body></html>
